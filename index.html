@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Living Protect 360 | Kalkulator PA + CI</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans p-4">
+
+  <!-- Header -->
+  <div class="max-w-md mx-auto text-center my-4">
+    <h1 class="text-2xl font-bold text-sky-400">Living Protect 360</h1>
+    <p class="text-xs text-slate-400">Kalkulator Gantian Gaji & Krisis Hidup (PA + CI)</p>
+  </div>
+
+  <!-- Main Card -->
+  <div class="max-w-md mx-auto bg-slate-800 rounded-xl p-5 shadow-xl border border-slate-700">
+    
+    <!-- Input Form -->
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Nama Prospek</label>
+        <input type="text" id="prospectName" placeholder="Contoh: En. Razak" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-sky-500">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Gaji Bulanan Bersih (RM)</label>
+        <input type="number" id="monthlySalary" placeholder="6000" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-sky-500">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Komitmen Bulanan (RM)</label>
+        <input type="number" id="monthlyExpenses" placeholder="4000" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-sky-500">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Kelas Pekerjaan</label>
+        <select id="jobClass" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-sky-500">
+          <option value="1">Kelas 1 (Pejabat / Indoor)</option>
+          <option value="2">Kelas 2 (Penyelia / Outstation)</option>
+          <option value="3">Kelas 3 (Manual / Risk Tinggi)</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Perlindungan PA / CI Sedia Ada (RM)</label>
+        <input type="number" id="existingCoverage" placeholder="50000" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-sky-500">
+      </div>
+
+      <button onclick="calculate()" class="w-full bg-sky-500 hover:bg-sky-600 text-slate-950 font-bold py-3 rounded-lg shadow-lg transition">
+        🚀 KIRA JURANG PA & CI
+      </button>
+    </div>
+
+    <!-- Output Section -->
+    <div id="results" class="hidden mt-6 pt-6 border-t border-slate-700 space-y-4">
+      
+      <!-- CI Result Card -->
+      <div class="bg-slate-900/80 p-3.5 rounded-lg border border-red-500/30">
+        <h3 class="text-sm font-bold text-red-400 mb-1">🩺 1. Risiko Penyakit Kritikal (CI)</h3>
+        <p class="text-xs text-slate-300">Dana Gantian Gaji (5 Tahun): <span id="ciSalaryText" class="font-bold text-white"></span></p>
+        <p class="text-xs text-slate-300">Ubat / Cost Lanjutan: <span class="font-bold text-white">RM 40,000</span></p>
+        <div class="text-xs font-bold text-red-400 mt-1">Keperluan CI: <span id="ciTotalText"></span></div>
+      </div>
+
+      <!-- PA Result Card -->
+      <div class="bg-slate-900/80 p-3.5 rounded-lg border border-amber-500/30">
+        <h3 class="text-sm font-bold text-amber-400 mb-1">🚑 2. Risiko Kemalangan & Lumpoh (PA)</h3>
+        <p class="text-xs text-slate-300">Dana Lumpoh Kekal (10 Tahun): <span id="paSalaryText" class="font-bold text-white"></span></p>
+        <p class="text-xs text-slate-300">Elaun Mingguan (Cuti Tanpa Gaji): <span id="weeklyText" class="font-bold text-white"></span> /minggu</p>
+        <div class="text-xs font-bold text-amber-400 mt-1">Keperluan PA: <span id="paTotalText"></span></div>
+      </div>
+
+      <!-- Total Deficit Banner -->
+      <div class="bg-red-950/60 p-4 rounded-lg border border-red-500 text-center">
+        <span class="text-xs text-red-300 uppercase tracking-wider font-semibold">Total Living Deficit (Jurang)</span>
+        <div id="grandDeficitText" class="text-2xl font-black text-amber-400 mt-0.5"></div>
+      </div>
+
+      <!-- Warning Callout -->
+      <blockquote class="bg-slate-900 p-3 rounded text-[11px] text-slate-400 border-l-2 border-sky-400">
+        ⚠️ <strong>Peringatan:</strong> Kad Perubatan menyelesaikan bil hospital, tetapi <strong>RM0</strong> dimasukkan ke akaun anda untuk bayar rumah, kereta & dapur semasa hilang keupayaan bekerja!
+      </blockquote>
+
+      <!-- WhatsApp Button -->
+      <button onclick="sendWhatsApp()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-lg shadow-lg flex items-center justify-center gap-2 transition">
+        📲 KONGSI RINGKASAN KE WHATSAPP
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    let globalData = {};
+
+    function calculate() {
+      const name = document.getElementById('prospectName').value || "Prospek";
+      const salary = parseFloat(document.getElementById('monthlySalary').value) || 0;
+      const expenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
+      const jobClass = document.getElementById('jobClass').value;
+      const existing = parseFloat(document.getElementById('existingCoverage').value) || 0;
+
+      if(salary === 0) {
+        alert("Sila masukkan jumlah gaji bulanan.");
+        return;
+      }
+
+      const ciSalaryReplacement = salary * 60;
+      const ciTotalNeeded = ciSalaryReplacement + 40000;
+
+      const paSalaryReplacement = salary * 120;
+      const paTotalNeeded = paSalaryReplacement + 25000;
+      const weeklyIndemnity = expenses / 4;
+
+      const totalLivingNeeded = ciTotalNeeded + paTotalNeeded;
+      const netDeficit = Math.max(0, totalLivingNeeded - existing);
+
+      globalData = {
+        name, salary, expenses, jobClass, existing,
+        ciTotalNeeded, paTotalNeeded, weeklyIndemnity, netDeficit
+      };
+
+      document.getElementById('ciSalaryText').innerText = `RM ${ciSalaryReplacement.toLocaleString()}`;
+      document.getElementById('ciTotalText').innerText = `RM ${ciTotalNeeded.toLocaleString()}`;
+      
+      document.getElementById('paSalaryText').innerText = `RM ${paSalaryReplacement.toLocaleString()}`;
+      document.getElementById('weeklyText').innerText = `RM ${weeklyIndemnity.toLocaleString()}`;
+      document.getElementById('paTotalText').innerText = `RM ${paTotalNeeded.toLocaleString()}`;
+
+      document.getElementById('grandDeficitText').innerText = `RM ${netDeficit.toLocaleString()}`;
+
+      document.getElementById('results').classList.remove('hidden');
+    }
+
+    function sendWhatsApp() {
+      const text = `Assalamualaikum En. ${globalData.name},%0A%0A` +
+        `Berikut adalah Ringkasan Analisis Perlindungan Hidup & Gantian Gaji (PA + CI) anda:%0A%0A` +
+        `💼 *Gaji Bulanan:* RM ${globalData.salary.toLocaleString()}%0A` +
+        `⚠️ *Kelas Pekerjaan:* Kelas ${globalData.jobClass}%0A%0A` +
+        `🩺 *1. RISIKO PENYAKIT KRITIKAL (CI):*%0A` +
+        `• Dana Gantian Gaji (5 Tahun Recovery): RM ${(globalData.salary * 60).toLocaleString()}%0A` +
+        `• *Keperluan Dana CI:* RM ${globalData.ciTotalNeeded.toLocaleString()}%0A%0A` +
+        `🚑 *2. RISIKO KEMALANGAN & LUMPOH (PA):*%0A` +
+        `• Dana Lumpoh Kekal (10 Tahun): RM ${(globalData.salary * 120).toLocaleString()}%0A` +
+        `• Elaun Mingguan (Cuti Tanpa Gaji): RM ${globalData.weeklyIndemnity.toLocaleString()} /minggu%0A` +
+        `• *Keperluan Dana PA:* RM ${globalData.paTotalNeeded.toLocaleString()}%0A%0A` +
+        `🚨 *TOTAL JURANG PERLINDUNGAN HIDUP (GAP): RM ${globalData.netDeficit.toLocaleString()}*%0A%0A` +
+        `💡 *IMPAK UTAMA:*%0A` +
+        `Kad Perubatan membayar bil hospital sahaja, tetapi TANPA DANA PA + CI, simpanan peribadi anda terpaksa dihabiskan untuk sara hidup keluarga semasa tidak dapat bekerja.%0A%0A` +
+        `📌 *Disediakan oleh: Ejen Takaful Anda*%0A` +
+        `🏢 *Khairi Qaizer Group*`;
+
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+
+    // Register Service Worker for PWA Capabilities
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
