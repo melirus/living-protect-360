@@ -145,51 +145,52 @@
       document.getElementById('results').classList.remove('hidden');
     }
 
-    function sendWhatsApp() {
-      // Safe state extraction with hard fallbacks
-      const name = globalData.name || "Prospek";
-      const salary = (globalData.salary || 0).toLocaleString();
-      const jobClass = globalData.jobClass || "1";
-      const ciSalary = ((globalData.salary || 0) * 60).toLocaleString();
-      const ciTotal = (globalData.ciTotalNeeded || 0).toLocaleString();
-      const paSalary = ((globalData.salary || 0) * 120).toLocaleString();
-      const weekly = (globalData.weeklyIndemnity || 0).toLocaleString();
-      const paTotal = (globalData.paTotalNeeded || 0).toLocaleString();
-      const netDeficit = (globalData.netDeficit || 0).toLocaleString();
+function sendWhatsApp() {
+  // 1. Fallback default values
+  const name = globalData.name || "Prospek";
+  const salary = (globalData.salary || 0).toLocaleString();
+  const jobClass = globalData.jobClass || "1";
+  const ciSalary = ((globalData.salary || 0) * 60).toLocaleString();
+  const ciTotal = (globalData.ciTotalNeeded || 0).toLocaleString();
+  const paSalary = ((globalData.salary || 0) * 120).toLocaleString();
+  const weekly = (globalData.weeklyIndemnity || 0).toLocaleString();
+  const paTotal = (globalData.paTotalNeeded || 0).toLocaleString();
+  const netDeficit = (globalData.netDeficit || 0).toLocaleString();
 
-      // Array joining ensures cross-platform safe multi-line string construction
-      const messageLines = [
-        "Assalamualaikum En. " + name + ",",
-        "",
-        "Berikut adalah Ringkasan Analisis Perlindungan Hidup & Gantian Gaji (PA + CI) anda:",
-        "",
-        "💼 Gaji Bulanan: RM " + salary,
-        "⚠️ Kelas Pekerjaan: Kelas " + jobClass,
-        "",
-        "🩺 1. RISIKO PENYAKIT KRITIKAL (CI):",
-        "• Dana Gantian Gaji (5 Tahun Recovery): RM " + ciSalary,
-        "• Keperluan Dana CI: RM " + ciTotal,
-        "",
-        "🚑 2. RISIKO KEMALANGAN & LUMPOH (PA):",
-        "• Dana Lumpoh Kekal (10 Tahun): RM " + paSalary,
-        "• Elaun Mingguan (Cuti Tanpa Gaji): RM " + weekly + " /minggu",
-        "• Keperluan Dana PA: RM " + paTotal,
-        "",
-        "🚨 TOTAL JURANG PERLINDUNGAN HIDUP (GAP): RM " + netDeficit,
-        "",
-        "💡 IMPAK UTAMA:",
-        "Kad Perubatan membayar bil hospital sahaja, tetapi TANPA DANA PA + CI, simpanan peribadi anda terpaksa dihabiskan untuk sara hidup keluarga semasa tidak dapat bekerja.",
-        "",
-        "📌 Disediakan oleh: Ejen Takaful Anda",
-        "🏢 Khairi Qaizer Group"
-      ];
+  // 2. Message array with ALL '&' replaced by 'DAN' or '+'
+  const messageLines = [
+    "Assalamualaikum En. " + name + ",",
+    "",
+    "Berikut adalah Ringkasan Analisis Perlindungan Hidup DAN Gantian Gaji (PA + CI) anda:",
+    "",
+    "💼 Gaji Bulanan: RM " + salary,
+    "⚠️ Kelas Pekerjaan: Kelas " + jobClass,
+    "",
+    "🩺 1. RISIKO PENYAKIT KRITIKAL (CI):",
+    "• Dana Gantian Gaji (5 Tahun Recovery): RM " + ciSalary,
+    "• Keperluan Dana CI: RM " + ciTotal,
+    "",
+    "🚑 2. RISIKO KEMALANGAN DAN LUMPOH (PA):",
+    "• Dana Lumpoh Kekal (10 Tahun): RM " + paSalary,
+    "• Elaun Mingguan (Cuti Tanpa Gaji): RM " + weekly + " /minggu",
+    "• Keperluan Dana PA: RM " + paTotal,
+    "",
+    "🚨 TOTAL JURANG PERLINDUNGAN HIDUP (GAP): RM " + netDeficit,
+    "",
+    "💡 IMPAK UTAMA:",
+    "Kad Perubatan membayar bil hospital sahaja, tetapi TANPA DANA PA + CI, simpanan peribadi anda terpaksa dihabiskan untuk sara hidup keluarga semasa tidak dapat bekerja.",
+    "",
+    "📌 Disediakan oleh: Ejen Takaful Anda",
+    "🏢 Khairi Qaizer Group"
+  ];
 
-      const fullText = messageLines.join("\n");
-      const encodedText = encodeURIComponent(fullText);
+  // 3. Join with newline and double-encode to survive redirects cleanly
+  const fullText = messageLines.join("\n");
+  const encodedText = encodeURIComponent(fullText);
 
-      // Force direct window location redirect to prevent browser truncation/popup blocking
-      window.location.href = "https://api.whatsapp.com/send?text=" + encodedText;
-    }
+  // 4. Trigger direct browser navigation
+  window.location.href = "https://api.whatsapp.com/send?text=" + encodedText;
+}
 
     // Service Worker Registration for PWA capability
     if ('serviceWorker' in navigator) {
