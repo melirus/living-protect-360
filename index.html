@@ -138,37 +138,53 @@
     }
 
 function sendWhatsApp() {
-  // Construct the full unencoded plain text message using standard JS templates
-  const fullText = 
-`Assalamualaikum En. ${globalData.name},
+  const name = globalData.name || "Prospek";
+  const salary = (globalData.salary || 0).toLocaleString();
+  const jobClass = globalData.jobClass || "1";
+  const ciSalary = ((globalData.salary || 0) * 60).toLocaleString();
+  const ciTotal = (globalData.ciTotalNeeded || 0).toLocaleString();
+  const paSalary = ((globalData.salary || 0) * 120).toLocaleString();
+  const weekly = (globalData.weeklyIndemnity || 0).toLocaleString();
+  const paTotal = (globalData.paTotalNeeded || 0).toLocaleString();
+  const netDeficit = (globalData.netDeficit || 0).toLocaleString();
 
-Berikut adalah Ringkasan Analisis Perlindungan Hidup & Gantian Gaji (PA + CI) anda:
+  // Clean multiline string without special encoding bugs
+  const lines = [
+    `Assalamualaikum En. ${name},`,
+    ``,
+    `Berikut adalah Ringkasan Analisis Perlindungan Hidup & Gantian Gaji (PA + CI) anda:`,
+    ``,
+    `💼 Gaji Bulanan: RM ${salary}`,
+    `⚠️ Kelas Pekerjaan: Kelas ${jobClass}`,
+    ``,
+    `🩺 1. RISIKO PENYAKIT KRITIKAL (CI):`,
+    `• Dana Gantian Gaji (5 Tahun Recovery): RM ${ciSalary}`,
+    `• Keperluan Dana CI: RM ${ciTotal}`,
+    ``,
+    `🚑 2. RISIKO KEMALANGAN & LUMPOH (PA):`,
+    `• Dana Lumpoh Kekal (10 Tahun): RM ${paSalary}`,
+    `• Elaun Mingguan (Cuti Tanpa Gaji): RM ${weekly} /minggu`,
+    `• Keperluan Dana PA: RM ${paTotal}`,
+    ``,
+    `🚨 TOTAL JURANG PERLINDUNGAN HIDUP (GAP): RM ${netDeficit}`,
+    ``,
+    `💡 IMPAK UTAMA:`,
+    `Kad Perubatan membayar bil hospital sahaja, tetapi TANPA DANA PA + CI, simpanan peribadi anda terpaksa dihabiskan untuk sara hidup keluarga semasa tidak dapat bekerja.`,
+    ``,
+    `📌 Disediakan oleh: Ejen Takaful Anda`,
+    `🏢 Qaizer Group`
+  ];
 
-💼 Gaji Bulanan: RM ${globalData.salary.toLocaleString()}
-⚠️ Kelas Pekerjaan: Kelas ${globalData.jobClass}
-
-🩺 1. RISIKO PENYAKIT KRITIKAL (CI):
-• Dana Gantian Gaji (5 Tahun Recovery): RM ${(globalData.salary * 60).toLocaleString()}
-• Keperluan Dana CI: RM ${globalData.ciTotalNeeded.toLocaleString()}
-
-🚑 2. RISIKO KEMALANGAN & LUMPOH (PA):
-• Dana Lumpoh Kekal (10 Tahun): RM ${(globalData.salary * 120).toLocaleString()}
-• Elaun Mingguan (Cuti Tanpa Gaji): RM ${globalData.weeklyIndemnity.toLocaleString()} /minggu
-• Keperluan Dana PA: RM ${globalData.paTotalNeeded.toLocaleString()}
-
-🚨 TOTAL JURANG PERLINDUNGAN HIDUP (GAP): RM ${globalData.netDeficit.toLocaleString()}
-
-💡 IMPAK UTAMA:
-Kad Perubatan membayar bil hospital sahaja, tetapi TANPA DANA PA + CI, simpanan peribadi anda terpaksa dihabiskan untuk sara hidup keluarga semasa tidak dapat bekerja.
-
-📌 Disediakan oleh: Ejen Takaful Anda
-🏢 Khairi Qaizer Group`;
-
-  // Safely encode the entire string into a clean URL-safe format
+  const fullText = lines.join("\n");
   const encodedText = encodeURIComponent(fullText);
 
-  // Open WhatsApp via the official API endpoint
-  window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+  // Use mobile intent link for phones, web link for desktop
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const waUrl = isMobile 
+    ? `whatsapp://send?text=${encodedText}` 
+    : `https://api.whatsapp.com/send?text=${encodedText}`;
+
+  window.open(waUrl, '_blank');
 }
 
     // Register Service Worker for PWA Capabilities
