@@ -9,7 +9,6 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f172a">
 </head>
-
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans p-4">
 
   <!-- Header -->
@@ -102,10 +101,10 @@
       const name = document.getElementById('prospectName').value || "Prospek";
       const salary = parseFloat(document.getElementById('monthlySalary').value) || 0;
       const expenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
-      const jobClass = document.getElementById('jobClass').value;
+      const jobClass = document.getElementById('jobClass').value || "1";
       const existing = parseFloat(document.getElementById('existingCoverage').value) || 0;
 
-      if(salary === 0) {
+      if (salary === 0) {
         alert("Sila masukkan jumlah gaji bulanan.");
         return;
       }
@@ -120,130 +119,79 @@
       const totalLivingNeeded = ciTotalNeeded + paTotalNeeded;
       const netDeficit = Math.max(0, totalLivingNeeded - existing);
 
+      // Save state securely
       globalData = {
-        name, salary, expenses, jobClass, existing,
-        ciTotalNeeded, paTotalNeeded, weeklyIndemnity, netDeficit
+        name: name,
+        salary: salary,
+        expenses: expenses,
+        jobClass: jobClass,
+        existing: existing,
+        ciTotalNeeded: ciTotalNeeded,
+        paTotalNeeded: paTotalNeeded,
+        weeklyIndemnity: weeklyIndemnity,
+        netDeficit: netDeficit
       };
 
-      document.getElementById('ciSalaryText').innerText = `RM ${ciSalaryReplacement.toLocaleString()}`;
-      document.getElementById('ciTotalText').innerText = `RM ${ciTotalNeeded.toLocaleString()}`;
+      // Update UI elements safely
+      document.getElementById('ciSalaryText').innerText = "RM " + ciSalaryReplacement.toLocaleString();
+      document.getElementById('ciTotalText').innerText = "RM " + ciTotalNeeded.toLocaleString();
       
-      document.getElementById('paSalaryText').innerText = `RM ${paSalaryReplacement.toLocaleString()}`;
-      document.getElementById('weeklyText').innerText = `RM ${weeklyIndemnity.toLocaleString()}`;
-      document.getElementById('paTotalText').innerText = `RM ${paTotalNeeded.toLocaleString()}`;
+      document.getElementById('paSalaryText').innerText = "RM " + paSalaryReplacement.toLocaleString();
+      document.getElementById('weeklyText').innerText = "RM " + weeklyIndemnity.toLocaleString();
+      document.getElementById('paTotalText').innerText = "RM " + paTotalNeeded.toLocaleString();
 
-      document.getElementById('grandDeficitText').innerText = `RM ${netDeficit.toLocaleString()}`;
+      document.getElementById('grandDeficitText').innerText = "RM " + netDeficit.toLocaleString();
 
       document.getElementById('results').classList.remove('hidden');
     }
 
-<script>
-  let globalData = {};
+    function sendWhatsApp() {
+      // Safe state extraction with hard fallbacks
+      const name = globalData.name || "Prospek";
+      const salary = (globalData.salary || 0).toLocaleString();
+      const jobClass = globalData.jobClass || "1";
+      const ciSalary = ((globalData.salary || 0) * 60).toLocaleString();
+      const ciTotal = (globalData.ciTotalNeeded || 0).toLocaleString();
+      const paSalary = ((globalData.salary || 0) * 120).toLocaleString();
+      const weekly = (globalData.weeklyIndemnity || 0).toLocaleString();
+      const paTotal = (globalData.paTotalNeeded || 0).toLocaleString();
+      const netDeficit = (globalData.netDeficit || 0).toLocaleString();
 
-  function calculate() {
-    const name = document.getElementById('prospectName').value || "Prospek";
-    const salary = parseFloat(document.getElementById('monthlySalary').value) || 0;
-    const expenses = parseFloat(document.getElementById('monthlyExpenses').value) || 0;
-    const jobClass = document.getElementById('jobClass').value || "1";
-    const existing = parseFloat(document.getElementById('existingCoverage').value) || 0;
+      // Array joining ensures cross-platform safe multi-line string construction
+      const messageLines = [
+        "Assalamualaikum En. " + name + ",",
+        "",
+        "Berikut adalah Ringkasan Analisis Perlindungan Hidup & Gantian Gaji (PA + CI) anda:",
+        "",
+        "💼 Gaji Bulanan: RM " + salary,
+        "⚠️ Kelas Pekerjaan: Kelas " + jobClass,
+        "",
+        "🩺 1. RISIKO PENYAKIT KRITIKAL (CI):",
+        "• Dana Gantian Gaji (5 Tahun Recovery): RM " + ciSalary,
+        "• Keperluan Dana CI: RM " + ciTotal,
+        "",
+        "🚑 2. RISIKO KEMALANGAN & LUMPOH (PA):",
+        "• Dana Lumpoh Kekal (10 Tahun): RM " + paSalary,
+        "• Elaun Mingguan (Cuti Tanpa Gaji): RM " + weekly + " /minggu",
+        "• Keperluan Dana PA: RM " + paTotal,
+        "",
+        "🚨 TOTAL JURANG PERLINDUNGAN HIDUP (GAP): RM " + netDeficit,
+        "",
+        "💡 IMPAK UTAMA:",
+        "Kad Perubatan membayar bil hospital sahaja, tetapi TANPA DANA PA + CI, simpanan peribadi anda terpaksa dihabiskan untuk sara hidup keluarga semasa tidak dapat bekerja.",
+        "",
+        "📌 Disediakan oleh: Ejen Takaful Anda",
+        "🏢 Khairi Qaizer Group"
+      ];
 
-    if(salary === 0) {
-      alert("Sila masukkan jumlah gaji bulanan.");
-      return;
+      const fullText = messageLines.join("\n");
+      const encodedText = encodeURIComponent(fullText);
+
+      // Force direct window location redirect to prevent browser truncation/popup blocking
+      window.location.href = "https://api.whatsapp.com/send?text=" + encodedText;
     }
 
-    const ciSalaryReplacement = salary * 60;
-    const ciTotalNeeded = ciSalaryReplacement + 40000;
-
-    const paSalaryReplacement = salary * 120;
-    const paTotalNeeded = paSalaryReplacement + 25000;
-    const weeklyIndemnity = expenses / 4;
-
-    const totalLivingNeeded = ciTotalNeeded + paTotalNeeded;
-    const netDeficit = Math.max(0, totalLivingNeeded - existing);
-
-    // Save calculation state
-    globalData = {
-      name: name,
-      salary: salary,
-      expenses: expenses,
-      jobClass: jobClass,
-      existing: existing,
-      ciTotalNeeded: ciTotalNeeded,
-      paTotalNeeded: paTotalNeeded,
-      weeklyIndemnity: weeklyIndemnity,
-      netDeficit: netDeficit
-    };
-
-    // Update UI elements
-    document.getElementById('ciSalaryText').innerText = "RM " + ciSalaryReplacement.toLocaleString();
-    document.getElementById('ciTotalText').innerText = "RM " + ciTotalNeeded.toLocaleString();
-    
-    document.getElementById('paSalaryText').innerText = "RM " + paSalaryReplacement.toLocaleString();
-    document.getElementById('weeklyText').innerText = "RM " + weeklyIndemnity.toLocaleString();
-    document.getElementById('paTotalText').innerText = "RM " + paTotalNeeded.toLocaleString();
-
-    document.getElementById('grandDeficitText').innerText = "RM " + netDeficit.toLocaleString();
-
-    document.getElementById('results').classList.remove('hidden');
-  }
-
-  function sendWhatsApp() {
-    // Ensure default values so execution never stops mid-string
-    const name = globalData.name || "Prospek";
-    const salary = (globalData.salary || 0).toLocaleString();
-    const jobClass = globalData.jobClass || "1";
-    const ciSalary = ((globalData.salary || 0) * 60).toLocaleString();
-    const ciTotal = (globalData.ciTotalNeeded || 0).toLocaleString();
-    const paSalary = ((globalData.salary || 0) * 120).toLocaleString();
-    const weekly = (globalData.weeklyIndemnity || 0).toLocaleString();
-    const paTotal = (globalData.paTotalNeeded || 0).toLocaleString();
-    const netDeficit = (globalData.netDeficit || 0).toLocaleString();
-
-    // Construct array of lines to avoid multiline string escaping issues
-    const messageLines = [
-      "Assalamualaikum En. " + name + ",",
-      "",
-      "Berikut adalah Ringkasan Analisis Perlindungan Hidup & Gantian Gaji (PA + CI) anda:",
-      "",
-      " Gaji Bulanan: RM " + salary,
-      " Kelas Pekerjaan: Kelas " + jobClass,
-      "",
-      " 1. RISIKO PENYAKIT KRITIKAL (CI):",
-      "• Dana Gantian Gaji (5 Tahun Recovery): RM " + ciSalary,
-      "• Keperluan Dana CI: RM " + ciTotal,
-      "",
-      " 2. RISIKO KEMALANGAN & LUMPOH (PA):",
-      "• Dana Lumpoh Kekal (10 Tahun): RM " + paSalary,
-      "• Elaun Mingguan (Cuti Tanpa Gaji): RM " + weekly + " /minggu",
-      "• Keperluan Dana PA: RM " + paTotal,
-      "",
-      " TOTAL JURANG PERLINDUNGAN HIDUP (GAP): RM " + netDeficit,
-      "",
-      " IMPAK UTAMA:",
-      "Kad Perubatan membayar bil hospital sahaja, tetapi TANPA DANA PA + CI, simpanan peribadi anda terpaksa dihabiskan untuk sara hidup keluarga semasa tidak dapat bekerja.",
-      "",
-      "📌 Disediakan oleh: Ejen Takaful Anda",
-      "🏢 Khairi Qaizer Group"
-    ];
-
-    // Join array elements with standard newline character
-    const fullText = messageLines.join("\n");
-    
-    // Safely encode for URL parameters
-    const encodedText = encodeURIComponent(fullText);
-
-    // Redirect directly to WhatsApp API
-    window.location.href = "https://api.whatsapp.com/send?text=" + encodedText;
-  }
-
-  // Register Service Worker for PWA
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
-
-    // Register Service Worker for PWA Capabilities
+    // Service Worker Registration for PWA capability
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
     }
