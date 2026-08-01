@@ -148,43 +148,35 @@ function sendWhatsApp() {
   const paTotal = (globalData.paTotalNeeded || 0).toLocaleString();
   const netDeficit = (globalData.netDeficit || 0).toLocaleString();
 
-  // Clean multiline string without special encoding bugs
-  const lines = [
-    `Assalamualaikum En. ${name},`,
-    ``,
-    `Berikut adalah Ringkasan Analisis Perlindungan Hidup & Gantian Gaji (PA + CI) anda:`,
-    ``,
-    `💼 Gaji Bulanan: RM ${salary}`,
-    `⚠️ Kelas Pekerjaan: Kelas ${jobClass}`,
-    ``,
-    `🩺 1. RISIKO PENYAKIT KRITIKAL (CI):`,
-    `• Dana Gantian Gaji (5 Tahun Recovery): RM ${ciSalary}`,
-    `• Keperluan Dana CI: RM ${ciTotal}`,
-    ``,
-    `🚑 2. RISIKO KEMALANGAN & LUMPOH (PA):`,
-    `• Dana Lumpoh Kekal (10 Tahun): RM ${paSalary}`,
-    `• Elaun Mingguan (Cuti Tanpa Gaji): RM ${weekly} /minggu`,
-    `• Keperluan Dana PA: RM ${paTotal}`,
-    ``,
-    `🚨 TOTAL JURANG PERLINDUNGAN HIDUP (GAP): RM ${netDeficit}`,
-    ``,
-    `💡 IMPAK UTAMA:`,
-    `Kad Perubatan membayar bil hospital sahaja, tetapi TANPA DANA PA + CI, simpanan peribadi anda terpaksa dihabiskan untuk sara hidup keluarga semasa tidak dapat bekerja.`,
-    ``,
-    `📌 Disediakan oleh: Ejen Takaful Anda`,
-    `🏢 Qaizer Group`
-  ];
+  // Clean ASCII-compatible text (No emojis in the raw string to prevent URL truncation)
+  const text = 
+    `Salam En. ${name},\n\n` +
+    `Berikut adalah Ringkasan Analisis Gantian Gaji (PA + CI):\n\n` +
+    `*Gaji Bulanan:* RM ${salary}\n` +
+    `*Kelas Pekerjaan:* Kelas ${jobClass}\n\n` +
+    `[1. RISIKO PENYAKIT KRITIKAL - CI]\n` +
+    `- Gantian Gaji (5 Tahun): RM ${ciSalary}\n` +
+    `- Keperluan CI: RM ${ciTotal}\n\n` +
+    `[2. RISIKO KEMALANGAN - PA]\n` +
+    `- Lumpoh Kekal (10 Tahun): RM ${paSalary}\n` +
+    `- Elaun Mingguan: RM ${weekly}/minggu\n` +
+    `- Keperluan PA: RM ${paTotal}\n\n` +
+    `*TOTAL JURANG (DEFISIT): RM ${netDeficit}*\n\n` +
+    `*Catatan:* Kad Perubatan bayar bil hospital sahaja. Tanpa PA/CI, simpanan peribadi terpaksa guna untuk sara hidup semasa tidak dapat bekerja.\n\n` +
+    `Disediakan oleh: Ejen Takaful Anda\n` +
+    `Qaizer Group`;
 
-  const fullText = lines.join("\n");
-  const encodedText = encodeURIComponent(fullText);
+  // Encode text
+  const encodedText = encodeURIComponent(text);
 
-  // Use mobile intent link for phones, web link for desktop
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const waUrl = isMobile 
-    ? `whatsapp://send?text=${encodedText}` 
-    : `https://api.whatsapp.com/send?text=${encodedText}`;
-
-  window.open(waUrl, '_blank');
+  // Fallback trigger using a temporary anchor tag (Bypasses popup blockers & url truncators)
+  const link = document.createElement('a');
+  link.href = `https://api.whatsapp.com/send?text=${encodedText}`;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
     // Register Service Worker for PWA Capabilities
