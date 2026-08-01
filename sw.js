@@ -1,6 +1,6 @@
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open('p360-store').then((cache) => cache.addAll([
+    caches.open('p360-store-v2').then((cache) => cache.addAll([
       './',
       './index.html',
       './manifest.json'
